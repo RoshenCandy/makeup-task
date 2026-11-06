@@ -1,9 +1,5 @@
 import { expect, type Locator, type Page } from '@playwright/test';
-import type { ClosedPriceRange } from '../../interfaces/closed-price-range';
-import type { FilterLayout } from '../../interfaces/filter-layout';
-import type { PriceBounds } from '../../interfaces/price-bounds';
-import type { PricePreset } from '../../interfaces/price-preset';
-import type { PriceRange } from '../../interfaces/price-range';
+import type { FilterLayout, PriceBounds, PricePreset, PriceRange } from '../../interfaces/price-filter';
 
 /**
  * Price filter fragment («Вартість») inside the category filters panel.
@@ -159,7 +155,10 @@ export class PriceFilter {
 
   /** The applied range is visible in the URL hash. A missing bound stays absent. */
   async expectRangeHash(range: PriceRange): Promise<void> {
-    await expect(this.page).toHaveURL(new RegExp(priceHash(range)));
+    const hash = priceHash(range);
+    if (hash !== '') {
+      await expect(this.page).toHaveURL(new RegExp(hash));
+    }
 
     if (range.from === undefined) {
       await expect(this.page).not.toHaveURL(/price_from=/);
@@ -212,10 +211,10 @@ function parsePresetLabel(label: string): PricePreset {
   return { label: normalized };
 }
 
-function isClosedPreset(preset: PricePreset): preset is PricePreset & ClosedPriceRange {
+function isClosedPreset(preset: PricePreset): preset is PricePreset & Required<PriceRange> {
   return preset.from !== undefined && preset.to !== undefined;
 }
 
-function distanceToMid(preset: PricePreset & ClosedPriceRange, mid: number): number {
+function distanceToMid(preset: PricePreset & Required<PriceRange>, mid: number): number {
   return Math.abs((preset.from + preset.to) / 2 - mid);
 }

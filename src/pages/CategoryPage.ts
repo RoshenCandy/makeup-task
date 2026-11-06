@@ -5,10 +5,8 @@ import {
   matchesPriceQuery,
   waitForProductsResponse,
 } from '../api/productsApi';
-import type { FilterLayout } from '../interfaces/filter-layout';
-import type { PricePreset } from '../interfaces/price-preset';
-import type { PriceRange } from '../interfaces/price-range';
-import type { ProductsListResponse } from '../interfaces/products-list-response';
+import type { FilterLayout, PricePreset, PriceRange } from '../interfaces/price-filter';
+import type { ProductsListResponse } from '../interfaces/products';
 import { PriceFilter } from './components/PriceFilter';
 
 export const DEFAULT_CATEGORY_ID = 23440;

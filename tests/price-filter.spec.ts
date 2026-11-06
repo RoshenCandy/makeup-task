@@ -4,7 +4,6 @@ import {
   deriveFilterRange,
   derivePriceFrom,
   derivePriceTo,
-  getPriceBounds,
   totalProducts,
 } from '../src/api/productsApi';
 
@@ -33,7 +32,8 @@ test.describe('Category price filter (Вартість)', () => {
     );
     const filtered = await test.step(`Apply preset "${preset.label}"`, () => categoryPage.applyPresetAndWait(preset));
 
-    await test.step('Assert API products fall within the preset range', () => {
+    await test.step('Assert URL hash and API prices match the preset range', async () => {
+      await categoryPage.priceFilter.expectRangeHash(preset);
       assertProductsInPriceRange(filtered.products, preset);
     });
   });
@@ -72,16 +72,18 @@ test.describe('Category price filter (Вартість)', () => {
       categoryPage.priceFilter.pickPresetForBounds(priceBounds),
     );
     const filtered = await test.step(`Apply preset "${preset.label}"`, () => categoryPage.applyPresetAndWait(preset));
+
+    await test.step('Assert the preset narrowed the products', () => {
+      assertProductsInPriceRange(filtered.products, preset);
+    });
+
     const cleared = await test.step('Clear filters and wait for unfiltered API response', () =>
       categoryPage.clearPriceFilterAndWait(),
     );
 
-    await test.step('Assert cleared response is broader than filtered', () => {
-      const filteredBounds = getPriceBounds(filtered.products);
-      const clearedBounds = getPriceBounds(cleared.products);
-
-      expect(totalProducts(cleared)).toBeGreaterThanOrEqual(totalProducts(filtered));
-      expect(clearedBounds.max - clearedBounds.min).toBeGreaterThanOrEqual(filteredBounds.max - filteredBounds.min);
+    await test.step('Assert the price hash is gone and the catalog is larger', async () => {
+      await categoryPage.priceFilter.expectRangeHash({});
+      expect(totalProducts(cleared)).toBeGreaterThan(totalProducts(filtered));
     });
   });
 });

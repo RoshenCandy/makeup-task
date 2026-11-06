@@ -1,14 +1,15 @@
 import { expect, type Page } from '@playwright/test';
-import type { CatalogTile } from '../interfaces/catalog-tile';
-import type { ClosedPriceRange } from '../interfaces/closed-price-range';
-import type { JsonObject, JsonValue } from '../interfaces/json-value';
-import type { PriceBounds } from '../interfaces/price-bounds';
-import type { PriceRange } from '../interfaces/price-range';
-import type { PricedProduct } from '../interfaces/priced-product';
-import type { ProductsHttpResponse } from '../interfaces/products-http-response';
-import type { ProductsListResponse } from '../interfaces/products-list-response';
-import type { ProductsQuery } from '../interfaces/products-query';
-import type { ProductsResponseWaitOptions } from '../interfaces/products-response-wait-options';
+import type { PriceBounds, PriceRange } from '../interfaces/price-filter';
+import type {
+  CatalogTile,
+  JsonObject,
+  JsonValue,
+  PricedProduct,
+  ProductsHttpResponse,
+  ProductsListResponse,
+  ProductsQuery,
+  ProductsResponseWaitOptions,
+} from '../interfaces/products';
 
 /** Network wait for category products XHR — longer than UI actionTimeout. */
 export const PRODUCTS_RESPONSE_TIMEOUT_MS = 45_000;
@@ -67,7 +68,7 @@ export function getPriceBounds(products: readonly CatalogTile[]): PriceBounds {
 }
 
 /** Mid sub-range derived from API prices — independent of specific SKUs. */
-export function deriveFilterRange(bounds: PriceBounds): ClosedPriceRange {
+export function deriveFilterRange(bounds: PriceBounds): Required<PriceRange> {
   if (bounds.min === bounds.max) {
     return { from: bounds.min, to: bounds.max };
   }
