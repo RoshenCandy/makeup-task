@@ -6,22 +6,15 @@ import type { GlobalStore } from '../interfaces/global-store';
  * Call once per BrowserContext (via fixture).
  *
  * CookieBanner «Погоджуюсь» → `accepted=true`
+ * Language → `lang=uk`
  * Rewards tooltip close → `localStorage.global-store.state.rewardModalWasShown`
  */
 export async function seedDismissedOverlays(context: BrowserContext): Promise<void> {
   const expires = Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 365;
 
   await context.addCookies([
-    {
-      name: 'accepted',
-      value: 'true',
-      domain: 'makeup.com.ua',
-      path: '/',
-      expires,
-      httpOnly: false,
-      secure: true,
-      sameSite: 'Lax',
-    },
+    siteCookie('accepted', 'true', expires),
+    siteCookie('lang', 'uk', expires),
   ]);
 
   await context.addInitScript(() => {
@@ -38,4 +31,17 @@ export async function seedDismissedOverlays(context: BrowserContext): Promise<vo
       }),
     );
   });
+}
+
+function siteCookie(name: string, value: string, expires: number) {
+  return {
+    name,
+    value,
+    domain: 'makeup.com.ua',
+    path: '/',
+    expires,
+    httpOnly: false,
+    secure: true,
+    sameSite: 'Lax' as const,
+  };
 }
